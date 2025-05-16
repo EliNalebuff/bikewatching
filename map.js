@@ -8,7 +8,7 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiZWxpbmFsZWJ1ZmYiLCJhIjoiY21hcjF6ZGRlMDZjdDJqb
 
 const map = new mapboxgl.Map({
   container: 'map',
-  style: 'mapbox://styles/mapbox/streets-v12',
+  style: 'mapbox://styles/elinalebuff/cmarcxjk6006b01rff6cz6527',
   center: [-71.09415, 42.36027],
   zoom: 12,
   minZoom: 5,
@@ -52,16 +52,24 @@ const selectedTime = document.getElementById('selected-time');
 const anyTimeLabel = document.getElementById('any-time');
 
 function updateTimeDisplay() {
-  timeFilter = Number(timeSlider.value);
-  if (timeFilter === -1) {
-    selectedTime.textContent = '';
-    anyTimeLabel.style.display = 'block';
-  } else {
-    selectedTime.textContent = formatTime(timeFilter);
-    anyTimeLabel.style.display = 'none';
+    timeFilter = Number(timeSlider.value);
+  
+    if (timeFilter === -1) {
+      document.querySelector('#selected-time .time-value').textContent = '';      selectedTime.style.visibility = 'hidden';
+      selectedTime.style.opacity = '0';
+      anyTimeLabel.style.visibility = 'visible';
+      anyTimeLabel.style.opacity = '1';
+    } else {
+      const selectedTimeValue = document.querySelector('#selected-time .time-value');
+      selectedTimeValue.textContent = formatTime(timeFilter);
+      selectedTime.style.visibility = 'visible';
+      selectedTime.style.opacity = '1';
+      anyTimeLabel.style.visibility = 'hidden';
+      anyTimeLabel.style.opacity = '0';
+    }
+  
+    updateScatterPlot(timeFilter);
   }
-  updateScatterPlot(timeFilter);
-}
 
 timeSlider.addEventListener('input', updateTimeDisplay);
 
@@ -84,10 +92,12 @@ function computeStationTraffic(stations, trips) {
 
   return stations.map(station => {
     const id = station.short_name;
-    station.departures = departures.get(id) ?? 0;
-    station.arrivals = arrivals.get(id) ?? 0;
-    station.totalTraffic = station.departures + station.arrivals;
-    return station;
+    return {
+      ...station, // copy original station fields
+      departures: departures.get(id) ?? 0,
+      arrivals: arrivals.get(id) ?? 0,
+      totalTraffic: (departures.get(id) ?? 0) + (arrivals.get(id) ?? 0)
+    };
   });
 }
 
@@ -98,14 +108,26 @@ function updateScatterPlot(timeFilter) {
   timeFilter === -1 ? radiusScale.range([0, 25]) : radiusScale.range([3, 50]);
 
   svg.selectAll('circle')
-    .data(filteredStations, d => d.short_name)
-    .join('circle')
-    .attr('r', d => radiusScale(d.totalTraffic))
-    .attr('fill', 'var(--color)')
-    .attr('stroke', 'white')
-    .attr('stroke-width', 1)
-    .attr('opacity', 0.8)
-    .style('--departure-ratio', d => stationFlow(d.departures / d.totalTraffic || 0));
+  .data(filteredStations, d => d.short_name)
+  .join(
+    enter => enter.append('circle')
+      .attr('r', d => radiusScale(d.totalTraffic))
+      .attr('fill', 'var(--color)')
+      .attr('stroke', 'white')
+      .attr('stroke-width', 1)
+      .attr('opacity', 0.8)
+      .style('--departure-ratio', d => stationFlow(d.departures / d.totalTraffic || 0))
+      .each(function (d) {
+        d3.select(this)
+          .append('title')
+          .text(`${d.totalTraffic} trips (${d.departures} departures, ${d.arrivals} arrivals)`);
+      }),
+    update => update
+      .attr('r', d => radiusScale(d.totalTraffic))
+      .style('--departure-ratio', d => stationFlow(d.departures / d.totalTraffic || 0))
+      .select('title')
+      .text(d => `${d.totalTraffic} trips (${d.departures} departures, ${d.arrivals} arrivals)`)
+  );
 
   updatePositions();
 }
@@ -173,7 +195,14 @@ map.on('load', async () => {
     .attr('stroke', 'white')
     .attr('stroke-width', 1)
     .attr('opacity', 0.8)
-    .style('--departure-ratio', d => stationFlow(d.departures / d.totalTraffic || 0));
+    .style('--departure-ratio', d => stationFlow(d.departures / d.totalTraffic || 0))
+    .each(function (d) {
+        d3.select(this)
+          .append('title')
+          .text(
+            `${d.totalTraffic} trips (${d.departures} departures, ${d.arrivals} arrivals)`
+          );
+      });
 
   updatePositions();
 

@@ -1,10 +1,125 @@
+/* Basic vertical layout setup */
 body {
     font: 100%/1.5 system-ui, sans-serif;
     display: flex;
-    flex-flow: column;
+    flex-direction: column;
     max-width: 80em;
     min-height: 100vh;
     margin: auto;
     padding: 1em;
     box-sizing: border-box;
+    background: #f9f9f9;
+  }
+  
+  /* Header styling */
+  .site-header {
+    text-align: center;
+    margin-bottom: 1em;
+  }
+  .site-header p {
+    margin-top: 0.3em;
+    margin-bottom: 0.5em;
+  }
+  .site-header h1 {
+    font-size: 2.8rem;
+    margin-bottom: 0em;
+    color: #1f3b87;
+  }
+  
+  .site-header .subtitle {
+    font-size: 1.1rem;
+    color: #444;
+    max-width: 40em;
+    margin: 0 auto;
+  }
+  
+  /* Time filter block (now stacked vertically) */
+  .time-filter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1.5em;
+    gap: 0.3em;
+  }
+  
+  .time-filter label {
+    font-size: 1rem;
+    text-align: center;
+  }
+  
+  /* Keep legend stacked beneath map */
+  .legend {
+    align-self: stretch;
+    margin-top: 1.5em;
+    margin-bottom: 1em;
+  }
+  
+  /* Time display styles */
+  .time-display {
+    position: relative;
+    height: 2em; /* Enough height for either message */
+    text-align: center;
+    margin-top: 0.5em;
+    margin-bottom: -2.3em
+  }
+  
+  #selected-time,
+  #any-time {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: .5em;
+    font-weight: bold;
+    transition: opacity 0.3s ease-in-out;
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+  
+  #selected-time {
+    opacity: 0;
+    visibility: hidden;
+  }
+  
+  #any-time {
+    opacity: 1;
+    visibility: visible;
+  }
+  .legend-2 {
+    display: flex;
+    align-items: center;
+    gap: 2em;
+    justify-content: center;
+    margin: -5em auto 0 auto; /* ⬅️ Adjust this */
+    font-size: 0.9rem;
+    flex-wrap: nowrap; /* prevent wrapping */
+    color: #444;
+    white-space: nowrap; /* prevent wrapping */
+    padding-bottom: 2rem;
+  }
+  
+  .legend-title {
+    font-weight: bold;
+    color: #888;
+    letter-spacing: 0.05em;
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+  }
+  
+  .swatch {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border-radius: 50%;
+    background: var(--color); /* from circle fill */
+    --color-departures: steelblue;
+    --color-arrivals: darkorange;
+    --color: color-mix(
+      in oklch,
+      var(--color-departures) calc(100% * var(--departure-ratio)),
+      var(--color-arrivals)
+    );
   }
