@@ -60,7 +60,7 @@ body {
     height: 2em; /* Enough height for either message */
     text-align: center;
     margin-top: 0.5em;
-    margin-bottom: -2.3em
+    margin-bottom: -2em
   }
   
   #selected-time,
