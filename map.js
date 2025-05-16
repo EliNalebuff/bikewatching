@@ -13,10 +13,18 @@ const map = new mapboxgl.Map({
 });
 
 function getCoords(station) {
-  const point = new mapboxgl.LngLat(+station.Long, +station.Lat);
-  const { x, y } = map.project(point);
-  return { cx: x, cy: y };
-}
+    const lat = parseFloat(station.lat);
+    const lon = parseFloat(station.lon);
+  
+    if (isNaN(lat) || isNaN(lon)) {
+      console.warn('Bad coords:', station);
+      return { cx: -1000, cy: -1000 };
+    }
+  
+    const point = new mapboxgl.LngLat(lon, lat);
+    const { x, y } = map.project(point);
+    return { cx: x, cy: y };
+  }
 
 map.on('load', async () => {
   console.log('Map loaded');
@@ -64,6 +72,7 @@ map.on('load', async () => {
   } catch (error) {
     console.error('Error loading JSON:', error);
   }
+  console.log('One example station:', stations[0]);
 
   const circles = svg
     .selectAll('circle')
