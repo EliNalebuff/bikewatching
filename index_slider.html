@@ -16,7 +16,17 @@
         <script src="map.js" type="module"></script>
       </head>
   <body>
-    <h1>🚴🏼‍♀️ Bikewatching</h1>
+    
+<header>
+  <h1>🚴🏼‍♀️ Bikewatching</h1>
+  <label style="margin-left: auto;">
+    Filter by time:
+    <input type="range" id="time-slider" min="-1" max="1440" value="-1" />
+    <time id="selected-time" style="display: block;"></time>
+    <em id="any-time" style="display: block; color: gray;">(any time)</em>
+  </label>
+</header>
+
     <p>An interactive map of Boston/Cambridge bike traffic, built with Mapbox + D3.</p>
     <div id="map">
   <svg></svg>
